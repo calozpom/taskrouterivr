@@ -83,8 +83,9 @@ function createTask(attributesString, fn) {
         //console.log(body);
         var newTaskResponse = JSON.parse(body);
         console.log("created a new tasks with Sid " + newTaskResponse.sid);
+        fn(newTaskResponse.sid);
     });
-    fn("test");
+    
 }
 app.post('/initiateivr', function(request, response) {
 
@@ -111,8 +112,8 @@ app.post('/initiateivr', function(request, response) {
 		response.send(testtest);
 	});
     
-    console.log("received this from dataToReturn " + dataToReturn);
-    return dataToReturn;
+    /*console.log("received this from dataToReturn " + dataToReturn);
+    return dataToReturn;*/
             //note the following call is async
             //Here I am looking up for a current task from this user. I could alternatively cookie the request, but that is time limited.
             /*
