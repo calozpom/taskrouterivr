@@ -91,7 +91,8 @@ function createTask(attributesString, fn) {
 function checkForExistingTask(CallSid, fn) {
 	console.log("checking for any existing task for this call SID");
 	var taskSid=false;
-	var queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + request.body['CallSid'] + "\")";
+	var queryJson = {};
+	queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + request.body['CallSid'] + "\")";
 	client.workspace.tasks.get(queryJson, function(err, data) {
         if (!err) {
             // looping through them, but call SIDs are unique and should only ever be one task maximum 	
