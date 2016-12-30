@@ -20,48 +20,58 @@ var workflowSid = process.env.workflowSid;
 
 var client = new twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
 
-//var workerSid = process.env.workerSid;
-
 /* the overview of this application is:
 This is a state machine which uses TaskRouter as the underlying engine for an IVR. Each Queue within TaskRouter represents a node within an IVR tree
  - When a call comes in to a twilio Number, Twilio Webhooks to this application requesting TwiML instructions to the call
- - While that webhook is pending, we create a task for the call and set it's attribute current_step to the first node of the IVR
- - We lookup what TwiML response should be indexed by the node name, and what the next node should be
- - We update the task with the new next_step attribute
-
- - The Task will enter a TaskQueue, causing Twilio to webhook again to this application to notify that the task has moved to a new IVR node (a task queue)
- - 
+ - While that webhook is pending, we lookup whether a task exists for this call SID
+ - If no task exists (it's a new call) then we create a task for the call. It will get routed to the default queue in the TaskRouter workflow
+ - If it's an existing task we update it's attributes with the previous node step, and any DTMF entered at that step
+ - Whether a new task or an updated task, we retrieve what task queue (node) the task is currently in
+ - we fetch the TwiML for that given node, and reply to the webhook with that
 */
 
-app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
-});
 
-app.get('/nodechange', function(request, response) {
-    // This function is triggered on the event when a task changes TaskQueue. TaskQueues represent individual nodes within an IVR.
-    if (request.body.TaskSid && request.body.EventType == "task-queue.entered") {
-        console.log("task moved into new queue " + request.body.TaskQueueSid);
-    }
-});
 
-app.get('/initiateivr', function(request, response) {
-    /* This function is triggered when a call fir
-     */
 
-});
 
-app.get('/continueivr', function(request, response) {
-    /*  This function is triggered when an IVR element such as gather provides another webhook.
+app.post('/initiateivr', function(request, response) {
+	    /*  This function is triggered when any step in programmable voice triggers a webhook as part of an IVR flow.
         It:
-        - fetches the TaskSID for this current call
+        - fetches the TaskSID for this current call if one exists, or creates one otherwise
         - Updates the attributes for this task with the content from the webhook request (e.g. DTMF digits)
         - Fetches the new TaskQueue which the task has been routed to based on those digits
         - Fetches the TwiML for that TaskQueue
         - Responds to the webhook with that TwiML
-    */
-    if (request.body.TaskSid && request.body.EventType == "task-queue.entered") {
-        console.log("task moved into new queue " + request.body.TaskQueueSid);
-    }
+
+        This method relies on a lot of asynchronous function, and uses callbacks for that. Alternatively this could
+        be built with promises.
+        */
+
+    var attributesJson = {};
+	
+    checkForExistingTask(request.body['CallSid'], function(returnedTask){
+    	if (!returnedTask) {
+		    attributesJson['CallSid'] = request.body['CallSid'];
+		    attributesJson['From'] = request.body['From'];
+		    attributesJson['To'] = request.body['To'];
+    		console.log("did not find an existing task for call sid " + request.body['CallSid'])
+			createTask(attributesJson, function(returnedTask){
+				console.log("created a new task for this call with SID " + returnedTask.sid);
+				console.log(returnedTask);
+				response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
+			});
+    	}
+    	else {
+    		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTask.sid);
+    		console.log("Dialed digits " + request.body['Digits']);
+    		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name;
+    		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
+    		updateTask(attributesJson, returnedTask.sid, function(returnedTask){
+	    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
+
+	    	});
+    	}
+    });
 });
 
 function createTask(attributesJson, fn) {
@@ -91,6 +101,32 @@ function createTask(attributesJson, fn) {
     
 }
 
+function updateTask(attributesJson, taskSid, fn) {
+	var attributesString = JSON.stringify(attributesJson);
+
+	var options = {
+        method: 'POST',
+        url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Tasks/'+ taskSid,
+        auth: {
+            username: accountSid,
+            password: authToken
+        },
+        form: {
+            Attributes: attributesString
+        }
+    };
+    console.log("Updating the existing task with these attributes");
+    console.log(attributesString);
+    req(options, function(error, response, body) {
+        if (error) throw new Error(error);
+        //console.log(body);
+        var newTaskResponse = JSON.parse(body);
+        console.log("updated the task with Sid " + newTaskResponse.sid);
+        fn(newTaskResponse);
+    });
+    
+}
+
 function checkForExistingTask(CallSid, fn) {
 	console.log("checking for any existing task for this call SID: " + CallSid);
 	var taskToReturn=false;
@@ -114,7 +150,7 @@ function getTwimlForTaskQueue(queueName) {
 	var twimlResponse="";
 	 switch (queueName) {
       case "first_node":
-        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the first node</Say></Response>"
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Gather timeout=\"10\" finishOnKey=\"*\"><Say>This call was routed to the first node. Please enter your zip code followed by star</Say></Gather></Response>"
         break;
 
      case "second_node":
@@ -124,92 +160,28 @@ function getTwimlForTaskQueue(queueName) {
     return twimlResponse;
 }
 
-app.post('/initiateivr', function(request, response) {
+/* 
+Functions below here are placeholders for where you could add additional logic
+*/
 
-    var foundTask = 0;
-    var attributesJson = {};
-    attributesJson['CallSid'] = request.body['CallSid'];
-    attributesJson['From'] = request.body['From'];
-    attributesJson['To'] = request.body['To'];
-    
-	
-    checkForExistingTask(request.body['CallSid'], function(returnedTask){
-    	if (!returnedTask) {
-    		console.log("did not find an existing task for call sid " + request.body['CallSid'])
-			createTask(attributesJson, function(returnedTask){
-				console.log("created a new task for this call with SID " + returnedTask.sid);
-				console.log(returnedTask);
-				response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
-			});
-    	}
-    	else {
-    		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTask.sid);
-    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
-    	}
-    });
-    
-    /*console.log("received this from dataToReturn " + dataToReturn);
-    return dataToReturn;*/
-            //note the following call is async
-            //Here I am looking up for a current task from this user. I could alternatively cookie the request, but that is time limited.
-            /*
-    var dataToReturn = client.workspace.tasks.get(queryJson, function(err, data) {
-        if (!err) {
-            // looping through them, but call SIDs are unique and should only ever be one task maximum 	
-            data.tasks.forEach(function(task) {
-                foundTask = 1;
-                console.log("found an existing task for this call. Trying to list attributes");
-                console.log(task.attributes);
-                console.log("will use this existing task sid for this conversation " + task.sid);
-                return task.sid;
-                //updateConversationPost(taskConversationSid, request, friendlyName_first, friendlyName_last);
-
-            });
-
-            if (!foundTask) {
-                console.log("did not find an existing active task for this IVR call - must be new call");
-
-                var attributesJson = {};
-                attributesJson['CallSid'] = request.body['CallSid'];
-                attributesJson['From'] = request.body['From'];
-                attributesJson['To'] = request.body['To'];
-                console.log("want to create a new task with these attributes");
-                console.log(attributesJson);
-                var attributesString = JSON.stringify(attributesJson);
-
-                var options = {
-                    method: 'POST',
-                    url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Tasks',
-                    auth: {
-                        username: accountSid,
-                        password: authToken
-                    },
-                    form: {
-                        WorkflowSid: workflowSid,
-                        Attributes: attributesString
-                    }
-                };
-
-                var dataToReturn = req(options, function(error, response, body) {
-                    if (error) throw new Error(error);
-                    //console.log(body);
-                    var newTaskResponse = JSON.parse(body);
-                    console.log("created a new tasks with Sid " + newTaskResponse.sid);
-                    return newTaskResponse.sid;
-
-                });
-                console.log("received this from dataToReturn " + dataToReturn);
-                return dataToReturn;
-            }
-        }
-    });
+app.get('/nodechange', function(request, response) {
+    /* This function is triggered on the event when a task changes TaskQueue. TaskQueues represent individual nodes within an IVR.
     */
-    /*console.log("received this from dataToReturn " + dataToReturn);
-    response.send(dataToReturn);*/
-
+    if (request.body.TaskSid && request.body.EventType == "task-queue.entered") {
+        console.log("task moved into new queue " + request.body.TaskQueueSid);
+    }
 });
+
+/* 
+functions beneath here are not core to the function and can be ignored
+*/
 
 app.get('/alive', function(request, response) {
 
     response.send('I AM ALIVE');
 });
+
+app.listen(app.get('port'), function() {
+    console.log('Node app is running on port', app.get('port'));
+});
+
