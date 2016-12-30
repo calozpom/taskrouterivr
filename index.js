@@ -140,7 +140,7 @@ app.post('/initiateivr', function(request, response) {
     	}
     	else {
     		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTask.sid);
-    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name);
+    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
     	}
     });
     
