@@ -11,8 +11,8 @@ app.set('port', (process.env.PORT || 5000));
 var accountSid = process.env.accountSid;
 var authToken = process.env.authToken;
 var workspaceSid = process.env.workspaceSid;
-var workflowSid = process.enc.workflowSid;
-var workerSid = process.env.workerSid;
+var workflowSid = process.env.workflowSid;
+//var workerSid = process.env.workerSid;
 
 /* the overview of this application is:
 This is a state machine which uses TaskRouter as the underlying engine for an IVR. Each Queue within TaskRouter represents a node within an IVR tree
