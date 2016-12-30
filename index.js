@@ -128,6 +128,7 @@ app.post('/initiateivr', function(request, response) {
     	}
     	else {
     		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTaskSid);
+    		response.send(returnedTaskSid);
     	}
     });
     
