@@ -107,7 +107,7 @@ function checkForExistingTask(CallSid, fn) {
             });
         }
     });
-    fn(task);
+    fn(taskToReturn);
 }
 
 function getTwimlForTaskQueue(queueName) {
