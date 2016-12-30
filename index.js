@@ -136,7 +136,9 @@ function checkForExistingTask(CallSid, fn) {
 	client.workspace.tasks.get(queryJson, function(err, data) {
         if (!err) {
             // looping through them, but call SIDs are unique and should only ever be one task maximum 	
-            data.tasks.forEach(function(task) {
+            // using a for loop instead of for each since we want to exit completely if we find one
+            for (var i=0; i< data.tasks.length; i++) {
+            	var task=data.tasks[i]
                 console.log("found an existing task for this call. Trying to list attributes");
                 console.log(task.attributes);
                 console.log("will use this existing task sid for this conversation " + task.sid);
@@ -144,7 +146,7 @@ function checkForExistingTask(CallSid, fn) {
                 console.log("ONE");
                 fn(taskToReturn);
                 return;
-            });
+            }
             console.log("TWO");
             fn(taskToReturn);
         }
