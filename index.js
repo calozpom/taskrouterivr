@@ -57,7 +57,7 @@ app.post('/initiateivr', function(request, response) {
     		console.log("did not find an existing task for call sid " + request.body['CallSid'])
 			createTask(attributesJson, function(returnedTask){
 				console.log("created a new task for this call with SID " + returnedTask.sid);
-				console.log(returnedTask);
+				//console.log(returnedTask);
 				response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
 			});
     	}
