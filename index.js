@@ -114,7 +114,11 @@ function getTwimlForTaskQueue(queueName) {
 	var twimlResponse="";
 	 switch (queueName) {
       case "first_node":
-        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>test test test </Say></Response>"
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the first node</Say></Response>"
+        break;
+
+     case "second_node":
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the second node</Say></Response>"
         break;
     }
     return twimlResponse;
