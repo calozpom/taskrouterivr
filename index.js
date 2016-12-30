@@ -120,13 +120,14 @@ app.post('/initiateivr', function(request, response) {
 	
     checkForExistingTask(request.body['CallSid'], function(returnedTaskSid){
     	if (!returnedTaskSid) {
+    		console.log("did not find an existing task for call sid " + request.body['CallSid'])
 			createTask(attributesJson, function(returnedTaskSid){
 				console.log("received from callback " + returnedTaskSid);
 				response.send(returnedTaskSid);
 			});
     	}
     	else {
-    		console.log("existing call " + returnedTaskSid);
+    		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTaskSid);
     	}
     });
     
