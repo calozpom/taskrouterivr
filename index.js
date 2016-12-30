@@ -104,7 +104,7 @@ function checkForExistingTask(CallSid, fn) {
             });
         }
     });
-    fn(task.sid);
+    fn(taskSid);
 }
 app.post('/initiateivr', function(request, response) {
 
