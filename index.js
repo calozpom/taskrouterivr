@@ -144,6 +144,9 @@ function checkForExistingTask(CallSid, fn) {
                 fn(taskToReturn);
             });
         }
+        else {
+        	fn(taskToReturn);
+        }
     });
     
 }
