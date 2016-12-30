@@ -122,7 +122,7 @@ app.post('/initiateivr', function(request, response) {
     	if (!returnedTaskSid) {
     		console.log("did not find an existing task for call sid " + request.body['CallSid'])
 			createTask(attributesJson, function(returnedTaskSid){
-				console.log("received from callback " + returnedTaskSid);
+				console.log("created a new task for this call with SID " + returnedTaskSid);
 				response.send(returnedTaskSid);
 			});
     	}
