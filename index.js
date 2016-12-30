@@ -50,7 +50,7 @@ app.post('/initiateivr', function(request, response) {
     var attributesJson = {};
 	
     checkForExistingTask(request.body['CallSid'], function(returnedTask){
-    	console.log(returnedTask);
+    	//console.log(returnedTask);
     	if (!returnedTask) {
 		    attributesJson['CallSid'] = request.body['CallSid'];
 		    attributesJson['From'] = request.body['From'];
@@ -122,7 +122,7 @@ function updateTask(attributesJson, taskSid, fn) {
         if (error) throw new Error(error);
         //console.log(body);
         var newTaskResponse = JSON.parse(body);
-        console.log("updated the task with Sid " + newTaskResponse.sid);
+        console.log("updated the task with Sid " + newTaskResponse.sid + "with attributes");
         fn(newTaskResponse);
     });
     
