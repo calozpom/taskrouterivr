@@ -67,7 +67,7 @@ app.post('/initiateivr', function(request, response) {
     		console.log("Dialed digits " + request.body['Digits']);
     		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name;
     		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
-    		updateTask(attributesJson, returnedTask.sid, function(returnedTask){
+    		updateTask(attributesJson, returnedTask, function(returnedTask){
 	    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
 
 	    	});
@@ -102,12 +102,19 @@ function createTask(attributesJson, fn) {
     
 }
 
-function updateTask(attributesJson, taskSid, fn) {
-	var attributesString = JSON.stringify(attributesJson);
+function updateTask(attributesJson, task, fn) {
+	var mergedAttributes = {};
+	var currentAttributes = JSON.parse(task.attributes);
+	console.log("Updating task which has current attributes of " + currentAttributes);
+	for(key in currentAttributes)
+	    mergedAttributes[key] = currentAttributes[key];
+	for(key in attributesJson)
+   		mergedAttributes[key] = attributesJson[key];
+	var attributesString = JSON.stringify(mergedAttributes);
 
 	var options = {
         method: 'POST',
-        url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Tasks/'+ taskSid,
+        url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Tasks/'+ task.sid,
         auth: {
             username: accountSid,
             password: authToken
