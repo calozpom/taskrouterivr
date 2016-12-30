@@ -86,14 +86,14 @@ function createTask(attributesJson, fn) {
         //console.log(body);
         var newTaskResponse = JSON.parse(body);
         console.log("created a new tasks with Sid " + newTaskResponse.sid);
-        fn(newTaskResponse.sid);
+        fn(newTaskResponse);
     });
     
 }
 
 function checkForExistingTask(CallSid, fn) {
 	console.log("checking for any existing task for this call SID: " + CallSid);
-	var taskSid=false;
+	var taskToReturn=false;
 	var queryJson = {};
 	queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + CallSid + "\")";
 	client.workspace.tasks.get(queryJson, function(err, data) {
@@ -103,12 +103,23 @@ function checkForExistingTask(CallSid, fn) {
                 console.log("found an existing task for this call. Trying to list attributes");
                 console.log(task.attributes);
                 console.log("will use this existing task sid for this conversation " + task.sid);
-                taskSid=task.sid;
+                taskToReturn=task;
             });
         }
     });
-    fn(taskSid);
+    fn(task);
 }
+
+function getTwimlForTaskQueue(queueName) {
+	var twimlResponse="";
+	 switch (queueName) {
+      case "first_node":
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>test test test </Say></Response>"
+        break;
+    }
+    return twimlResponse;
+}
+
 app.post('/initiateivr', function(request, response) {
 
     var foundTask = 0;
@@ -118,17 +129,18 @@ app.post('/initiateivr', function(request, response) {
     attributesJson['To'] = request.body['To'];
     
 	
-    checkForExistingTask(request.body['CallSid'], function(returnedTaskSid){
-    	if (!returnedTaskSid) {
+    checkForExistingTask(request.body['CallSid'], function(returnedTask){
+    	if (!returnedTask) {
     		console.log("did not find an existing task for call sid " + request.body['CallSid'])
-			createTask(attributesJson, function(returnedTaskSid){
-				console.log("created a new task for this call with SID " + returnedTaskSid);
-				response.send(returnedTaskSid);
+			createTask(attributesJson, function(returnedTask){
+				console.log("created a new task for this call with SID " + returnedTask.sid);
+				console.log(returnedTask);
+				response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
 			});
     	}
     	else {
-    		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTaskSid);
-    		response.send(returnedTaskSid);
+    		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTask.sid);
+    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name);
     	}
     });
     
