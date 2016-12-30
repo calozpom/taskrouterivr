@@ -50,6 +50,7 @@ app.post('/initiateivr', function(request, response) {
     var attributesJson = {};
 	
     checkForExistingTask(request.body['CallSid'], function(returnedTask){
+    	console.log(returnedTask);
     	if (!returnedTask) {
 		    attributesJson['CallSid'] = request.body['CallSid'];
 		    attributesJson['From'] = request.body['From'];
