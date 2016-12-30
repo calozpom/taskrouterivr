@@ -180,15 +180,18 @@ function getTwimlForTaskQueue(task) {
         twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
         break;
     }
-    return replaceTokensWithAttributes(twimlResponse, task);
+    replaceTokensWithAttributes(twimlResponse, task);
+    return twimlResponse;
 }
 
 function replaceTokensWithAttributes(twimlResponse, task) {
+	console.log("Attempting to replace tokens");
 	var parsedResponse = twimlResponse.replace(/%(.*?)%/gi, function(a,b) {
 		console.log("parsed Response " + parsedResponse);
 		console.log("a " + a);
 		console.log("b" + b);
 	});
+
 }
 
 /* 
