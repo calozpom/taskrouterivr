@@ -87,16 +87,25 @@ function createTask(attributesString, fn) {
     });
     
 }
+
+function checkForExistingTask(CallSid, fn) {
+	console.log("checking for any existing task for this call SID");
+	var taskSid=false;
+	var queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + request.body['CallSid'] + "\")";
+	client.workspace.tasks.get(queryJson, function(err, data) {
+        if (!err) {
+            // looping through them, but call SIDs are unique and should only ever be one task maximum 	
+            data.tasks.forEach(function(task) {
+                console.log("found an existing task for this call. Trying to list attributes");
+                console.log(task.attributes);
+                console.log("will use this existing task sid for this conversation " + task.sid);
+                taskSid=task.sid;
+            });
+        }
+    });
+    fn(task.sid);
+}
 app.post('/initiateivr', function(request, response) {
-
-
-
-
-    console.log("checking for any existing task for this call SID");
-    var queryJson = {};
-    var CallSid = "";
-
-    queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + request.body['CallSid'] + "\")";
 
     var foundTask = 0;
     var attributesJson = {};
@@ -105,12 +114,19 @@ app.post('/initiateivr', function(request, response) {
     attributesJson['To'] = request.body['To'];
     console.log("want to create a new task with these attributes");
     console.log(attributesJson);
-
     var attributesString = JSON.stringify(attributesJson);
-	createTask(attributesString, function(testtest){
-		console.log("received from callback " + testtest);
-		response.send(testtest);
-	});
+	
+    checkForExistingTask(request.body['CallSid'], function(returnedTaskSid){
+    	if (!returnedTaskSid) {
+			createTask(attributesString, function(returnedTaskSid){
+				console.log("received from callback " + returnedTaskSid);
+				response.send(returnedTaskSid);
+			});
+    	}
+    	else {
+    		console.log("existing call " + returnedTaskSid);
+    	}
+    });
     
     /*console.log("received this from dataToReturn " + dataToReturn);
     return dataToReturn;*/
