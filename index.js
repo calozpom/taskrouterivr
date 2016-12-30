@@ -68,6 +68,7 @@ app.post('/initiateivr', function(request, response) {
     		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name;
     		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
     		updateTask(attributesJson, returnedTask, function(updatedTask){
+    			console.log("getting twiml for a task in queue " + updatedTask.task_queue_friendly_name);
 	    		response.send(getTwimlForTaskQueue(updatedTask));
 
 	    	});
@@ -134,6 +135,7 @@ function updateTask(attributesJson, task, fn) {
         //console.log(body);
         var newTaskResponse = JSON.parse(body);
         console.log("updated the task with Sid " + newTaskResponse.sid + "with attributes");
+        console.log("Task is now in the queue " + newTaskResponse.task_queue_friendly_name);
         fn(newTaskResponse);
     });
     
