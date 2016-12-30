@@ -64,6 +64,28 @@ app.get('/continueivr', function(request, response) {
     }
 });
 
+function createTask(attributesString, fn) {
+	var options = {
+        method: 'POST',
+        url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Tasks',
+        auth: {
+            username: accountSid,
+            password: authToken
+        },
+        form: {
+            WorkflowSid: workflowSid,
+            Attributes: attributesString
+        }
+    };
+
+    req(options, function(error, response, body) {
+        if (error) throw new Error(error);
+        //console.log(body);
+        var newTaskResponse = JSON.parse(body);
+        console.log("created a new tasks with Sid " + newTaskResponse.sid);
+    });
+    fn("test");
+}
 app.post('/initiateivr', function(request, response) {
 
 
@@ -76,8 +98,24 @@ app.post('/initiateivr', function(request, response) {
     queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + request.body['CallSid'] + "\")";
 
     var foundTask = 0;
-    //note the following call is async
-    //Here I am looking up for a current task from this user. I could alternatively cookie the request, but that is time limited.
+    var attributesJson = {};
+    attributesJson['CallSid'] = request.body['CallSid'];
+    attributesJson['From'] = request.body['From'];
+    attributesJson['To'] = request.body['To'];
+    console.log("want to create a new task with these attributes");
+    console.log(attributesJson);
+
+    var attributesString = JSON.stringify(attributesJson);
+	createTask(attributesString, function(testtest){
+		console.log("received from callback " + testtest);
+		response.send(testtest);
+	});
+    
+    console.log("received this from dataToReturn " + dataToReturn);
+    return dataToReturn;
+            //note the following call is async
+            //Here I am looking up for a current task from this user. I could alternatively cookie the request, but that is time limited.
+            /*
     var dataToReturn = client.workspace.tasks.get(queryJson, function(err, data) {
         if (!err) {
             // looping through them, but call SIDs are unique and should only ever be one task maximum 	
@@ -128,8 +166,9 @@ app.post('/initiateivr', function(request, response) {
             }
         }
     });
-    console.log("received this from dataToReturn " + dataToReturn);
-    response.send(dataToReturn);
+    */
+    /*console.log("received this from dataToReturn " + dataToReturn);
+    response.send(dataToReturn);*/
 
 });
 
