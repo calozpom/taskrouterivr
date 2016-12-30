@@ -141,12 +141,15 @@ function checkForExistingTask(CallSid, fn) {
                 console.log(task.attributes);
                 console.log("will use this existing task sid for this conversation " + task.sid);
                 taskToReturn=task;
+                console.log("ONE");
                 fn(taskToReturn);
                 return;
             });
+            console.log("TWO");
             fn(taskToReturn);
         }
         else {
+        	console.log("THREE");
         	fn(taskToReturn);
         }
     });
