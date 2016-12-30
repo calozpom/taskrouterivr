@@ -64,7 +64,9 @@ app.get('/continueivr', function(request, response) {
     }
 });
 
-function createTask(attributesString, fn) {
+function createTask(attributesJson, fn) {
+	var attributesString = JSON.stringify(attributesJson);
+
 	var options = {
         method: 'POST',
         url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Tasks',
@@ -77,7 +79,8 @@ function createTask(attributesString, fn) {
             Attributes: attributesString
         }
     };
-
+    console.log("want to create a new task with these attributes");
+    console.log(attributesString);
     req(options, function(error, response, body) {
         if (error) throw new Error(error);
         //console.log(body);
@@ -89,7 +92,7 @@ function createTask(attributesString, fn) {
 }
 
 function checkForExistingTask(CallSid, fn) {
-	console.log("checking for any existing task for this call SID");
+	console.log("checking for any existing task for this call SID: " + CallSid);
 	var taskSid=false;
 	var queryJson = {};
 	queryJson['EvaluateTaskAttributes'] = "(CallSid=\"" + CallSid + "\")";
@@ -113,13 +116,11 @@ app.post('/initiateivr', function(request, response) {
     attributesJson['CallSid'] = request.body['CallSid'];
     attributesJson['From'] = request.body['From'];
     attributesJson['To'] = request.body['To'];
-    console.log("want to create a new task with these attributes");
-    console.log(attributesJson);
-    var attributesString = JSON.stringify(attributesJson);
+    
 	
     checkForExistingTask(request.body['CallSid'], function(returnedTaskSid){
     	if (!returnedTaskSid) {
-			createTask(attributesString, function(returnedTaskSid){
+			createTask(attributesJson, function(returnedTaskSid){
 				console.log("received from callback " + returnedTaskSid);
 				response.send(returnedTaskSid);
 			});
