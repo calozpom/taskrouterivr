@@ -123,10 +123,12 @@ app.post('/initiateivr', function(request, response) {
                     return newTaskResponse.sid;
 
                 });
+                console.log("received this from dataToReturn " + dataToReturn);
                 return dataToReturn;
             }
         }
     });
+    console.log("received this from dataToReturn " + dataToReturn);
     response.send(dataToReturn);
 
 });
