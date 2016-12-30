@@ -59,7 +59,7 @@ app.post('/initiateivr', function(request, response) {
 			createTask(attributesJson, function(returnedTask){
 				console.log("created a new task for this call with SID " + returnedTask.sid);
 				//console.log(returnedTask);
-				response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
+				response.send(getTwimlForTaskQueue(returnedTask));
 			});
     	}
     	else {
@@ -68,7 +68,7 @@ app.post('/initiateivr', function(request, response) {
     		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name;
     		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
     		updateTask(attributesJson, returnedTask, function(returnedTask){
-	    		response.send(getTwimlForTaskQueue(returnedTask.task_queue_friendly_name));
+	    		response.send(getTwimlForTaskQueue(returnedTask));
 
 	    	});
     	}
@@ -103,9 +103,13 @@ function createTask(attributesJson, fn) {
 }
 
 function updateTask(attributesJson, task, fn) {
+	/*
+	This function will update a task with new attributes
+	Note that it will append (or overwrite where keys are the same value) but will not delete existing attributes
+	*/
 	var mergedAttributes = {};
 	var currentAttributes = JSON.parse(task.attributes);
-	console.log("Updating task which has current attributes of " + currentAttributes);
+	console.log("Updating task which has current attributes of " + task.attributes);
 	for(key in currentAttributes)
 	    mergedAttributes[key] = currentAttributes[key];
 	for(key in attributesJson)
@@ -165,18 +169,26 @@ function checkForExistingTask(CallSid, fn) {
     
 }
 
-function getTwimlForTaskQueue(queueName) {
+function getTwimlForTaskQueue(task) {
 	var twimlResponse="";
-	 switch (queueName) {
+	 switch (task.task_queue_friendly_name) {
       case "first_node":
         twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Gather timeout=\"10\" finishOnKey=\"*\"><Say>This call was routed to the first node. Please enter your zip code followed by star</Say></Gather></Response>"
         break;
 
      case "second_node":
-        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the second node</Say></Response>"
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
         break;
     }
-    return twimlResponse;
+    return replaceTokensWithAttributes(twimlResponse, task);
+}
+
+function replaceTokensWithAttributes(twimlResponse, task) {
+	var parsedResponse = twimlResponse.replace(/%(.*?)%/gi, function(a,b) {
+		console.log("parsed Response " + parsedResponse);
+		console.log("a " + a);
+		console.log("b" + b);
+	});
 }
 
 /* 
