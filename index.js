@@ -17,6 +17,9 @@ var accountSid = process.env.accountSid;
 var authToken = process.env.authToken;
 var workspaceSid = process.env.workspaceSid;
 var workflowSid = process.env.workflowSid;
+
+var client = new twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
+
 //var workerSid = process.env.workerSid;
 
 /* the overview of this application is:
