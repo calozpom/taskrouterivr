@@ -67,8 +67,8 @@ app.post('/initiateivr', function(request, response) {
     		console.log("Dialed digits " + request.body['Digits']);
     		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name;
     		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
-    		updateTask(attributesJson, returnedTask, function(returnedTask){
-	    		response.send(getTwimlForTaskQueue(returnedTask));
+    		updateTask(attributesJson, returnedTask, function(updatedTask){
+	    		response.send(getTwimlForTaskQueue(updatedTask));
 
 	    	});
     	}
