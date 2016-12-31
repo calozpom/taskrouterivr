@@ -207,10 +207,13 @@ function getTwimlForTaskQueue(task) {
 	var twimlResponse="";
 	 switch (task.task_queue_friendly_name) {
       case "first_node":
-        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Gather timeout=\"10\" finishOnKey=\"*\"><Say>This call was routed to the first node. Please enter your zip code followed by star</Say></Gather></Response>"
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Gather timeout=\"10\" finishOnKey=\"*\"><Say>This call was routed to the first node. Please enter your zip code followed by star</Say></Gather><Redirect></Redirect></Response>"
         break;
 
      case "second_node":
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call from %From% was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
+        break;
+     case "enqueue":
         twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call from %From% was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
         break;
     }
@@ -219,9 +222,16 @@ function getTwimlForTaskQueue(task) {
 }
 
 function replaceTokensWithAttributes(twimlResponse, task) {
+	/*
+	This function will take a given twiml response and look for any tokens of the form %token_name%
+	If it finds them it will then look at the provided task and if there are any attributes of name token_name
+	It will replace tokens with the value of the attribute for the given task
+	If that value is a number it will also split it from e.g. 94598 to 9 4 5 9 8 so that Alice pronounces it correctly
+	*/
 	console.log("Attempting to replace tokens");
 	var parsedResponse = twimlResponse.replace(/%(.*?)%/gi, function(a,b) {
  		if (JSON.parse(task.attributes)[b]) {
+ 			// need to add logic here to only split numbers
  			return JSON.parse(task.attributes)[b].split('').join(' ');
  		}
  		else {
