@@ -211,7 +211,7 @@ function getTwimlForTaskQueue(task) {
         break;
 
      case "second_node":
-        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call from %From% was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
         break;
     }
     return replaceTokensWithAttributes(twimlResponse, task);
@@ -224,13 +224,15 @@ function replaceTokensWithAttributes(twimlResponse, task) {
 		console.log("a " + a);
 		console.log("b " + b);
  		if (JSON.parse(task.attributes)[b]) {
- 			return JSON.parse(task.attributes)[b]
+ 			return JSON.parse(task.attributes)[b];
+ 		}
+ 		else {
+ 			return "";
  		}
 
 
 	});
 	return parsedResponse;
-	console.log("parsed Response " + parsedResponse);
 
 }
 
