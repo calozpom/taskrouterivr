@@ -229,6 +229,7 @@ function replaceTokensWithAttributes(twimlResponse, task) {
 
 
 	});
+	return twimlResponse;
 	console.log("parsed Response " + parsedResponse);
 
 }
