@@ -221,10 +221,11 @@ function getTwimlForTaskQueue(task) {
 function replaceTokensWithAttributes(twimlResponse, task) {
 	console.log("Attempting to replace tokens");
 	var parsedResponse = twimlResponse.replace(/%(.*?)%/gi, function(a,b) {
-		console.log("parsed Response " + parsedResponse);
+
 		console.log("a " + a);
-		console.log("b" + b);
+		console.log("b " + b);
 	});
+	console.log("parsed Response " + parsedResponse);
 
 }
 
