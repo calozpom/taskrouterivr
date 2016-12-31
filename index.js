@@ -136,9 +136,38 @@ function updateTask(attributesJson, task, fn) {
         var newTaskResponse = JSON.parse(body);
         console.log("updated the task with Sid " + newTaskResponse.sid + "with attributes");
         console.log("Task is now in the queue " + newTaskResponse.task_queue_friendly_name);
-        fn(newTaskResponse);
+        /* In an ideal world this would be all you'd have to do
+        But TaskRouter will sometimes return the task before the workflow has been re-run and so you'll still get the current queue
+        back not the new queue
+        the foreceTaskRefresh function and call here is to ensure that the workflow has been re-evaluated and the task is in the new queue*/
+        forceTaskRefresh(newTaskResponse.sid, function(updatedTask){
+        	checkForExistingTask(newTaskResponse.sid, function(returnedTask){
+        		fn(returnedTask);
+        	});
+        });
+        
+        //fn(newTaskResponse);
     });
     
+}
+
+function forceTaskRefresh(taskSid, fn) {
+	var tempOptions = {
+	      method: 'POST',
+	      url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Workflows/' + workflowSid,
+	      auth: {
+	        username: accountSid,
+	        password: authToken
+	      },
+	      form: {
+	        ReEvaluateTasks: true
+	      }
+	    };
+	    req(tempOptions, function(error, response, body) {
+	      if (error) throw new Error(error);
+	      fn(true);
+	  });
+
 }
 
 function checkForExistingTask(CallSid, fn) {
