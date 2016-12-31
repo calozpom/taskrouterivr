@@ -141,7 +141,10 @@ function updateTask(attributesJson, task, fn) {
         back not the new queue
         the foreceTaskRefresh function and call here is to ensure that the workflow has been re-evaluated and the task is in the new queue*/
         forceTaskRefresh(newTaskResponse.sid, function(updatedTask){
-        	checkForExistingTask(newTaskResponse.sid, function(returnedTask){
+        	console.log("Forced a workflow refresh");
+        	console.log("Attempting to look for the task again with call sid " + mergedAttributes['CallSid'])
+        	checkForExistingTask(mergedAttributes['CallSid'], function(returnedTask){
+        		console.log("forcibly updated task. New queue is now " + returnedTask.task_queue_friendly_name);
         		fn(returnedTask);
         	});
         });
