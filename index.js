@@ -224,6 +224,7 @@ function replaceTokensWithAttributes(twimlResponse, task) {
 
 		console.log("a " + a);
 		console.log("b " + b);
+		return "mooooo";
 	});
 	console.log("parsed Response " + parsedResponse);
 
