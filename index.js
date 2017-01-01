@@ -207,11 +207,14 @@ function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
 	for (key in taskAttributes) {
 		console.log("trying to check attribute " + taskAttributes[key]);
-		var editedAttributeValue = taskAttributes[key].replace(/\d+/gi, function(a,b) {
+		var editedAttributeValue = taskAttributes[key].replace(/^\+*\d+$/gi, function(a,b) {
 			console.log("found attribute with number " + a + " " + b);
- 			return a.split('').join(' ');
-        taskAttributes[key]=editedAttributeValue;
+			var result =a.split('').join(' ');
+			console.log("Returning " + result)
+ 			return result;
+        
 	});
+		taskAttributes[key]=editedAttributeValue;
 
 	}
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
