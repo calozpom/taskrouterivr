@@ -204,6 +204,15 @@ function checkForExistingTask(CallSid, fn) {
 }
 
 function getTwimlfromTwimlBin(task) {
+	var taskAttributes=JSON.parse(task.attributes);
+	for key in taskAttributes {
+		var editedAttributeValue = taskAttributes[key].replace(/^\d+$/gi, function(a,b) {
+			console.log("found attribute with number " + a + " " + b);
+ 			return a.split('').join(' ');
+        taskAttributes[key]=editedAttributeValue;
+	});
+
+	}
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
 	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d?";
 	twimlResponse+=encodeURIComponent(JSON.stringify(JSON.parse(task.attributes)));
