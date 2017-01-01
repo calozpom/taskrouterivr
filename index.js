@@ -208,43 +208,33 @@ function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
 	var resp=new twilio.TwimlResponse();
 
-
+	
 	for (key in taskAttributes) {
-		newKey = "task"+key;
+		/* First we will rename the attribute keys, because we want to use our own
+		"From" rather than the one natively available to the twimlBin, due to needing to edit it to
+		Make Alice speak numbers right
+		*/
+		newKey = "task."+key;
 		taskAttributes[newKey]=taskAttributes[key];
 		delete taskAttributes[key];
-		console.log("trying to check attribute " + taskAttributes[newKey]);
+		/* Next lets match anything that a number or an E164 number and put spaces between them
+		to make alice speak it right */
 		var editedAttributeValue = taskAttributes[newKey].replace(/^\+*\d+$/gi, function(a,b) {
-			console.log("found attribute with number " + a + " " + b);
 			var result =a.split('').join('  ');
-			console.log("Returning " + result)
  			return result;
         
 	});
-
-		console.log("edited value is " + editedAttributeValue);
-		console.log("taskAttributes key is " + taskAttributes[newKey]);
 		taskAttributes[newKey]=editedAttributeValue;
-		console.log("taskattributes key is " + taskAttributes[newKey]);
-
-
 	}
 	var redirectUrl="";
 	redirectUrl+="https://handler.twilio.com/twiml/";
+	// Extract the TwiML Bin URL from the taskqueue name:
 	redirectUrl+="EH43e353c16b04583ef2c7ee8769ac219d?";
+
 	redirectUrl+=querystring.stringify(taskAttributes);
 	resp.redirect(redirectUrl);
-	console.log("twiml to string:");
-	console.log(resp.toString());
 
-	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
-	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d?";
-	console.log(encodeURIComponent(taskAttributes));
-	console.log(querystring.stringify(taskAttributes));
-	twimlResponse+=querystring.stringify(taskAttributes);
-	twimlResponse +="</Redirect></Response>"
 	return resp.toString();
-	//return twimlResponse;
 }
 
 function getTwimlForTaskQueue(task) {
