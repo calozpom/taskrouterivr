@@ -219,7 +219,7 @@ function getTwimlfromTwimlBin(task) {
 	}
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
 	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d?";
-	twimlResponse+=encodeURIComponent(JSON.stringify(JSON.parse(task.attributes)));
+	twimlResponse+=encodeURIComponent(JSON.stringify(taskAttributes));
 	twimlResponse +="</Redirect></Response>"
 	return twimlResponse;
 }
