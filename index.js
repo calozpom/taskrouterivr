@@ -205,7 +205,7 @@ function checkForExistingTask(CallSid, fn) {
 
 function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
-	for key in taskAttributes {
+	for (key in taskAttributes) {
 		var editedAttributeValue = taskAttributes[key].replace(/^\d+$/gi, function(a,b) {
 			console.log("found attribute with number " + a + " " + b);
  			return a.split('').join(' ');
