@@ -209,7 +209,7 @@ function getTwimlfromTwimlBin(task) {
 		console.log("trying to check attribute " + taskAttributes[key]);
 		var editedAttributeValue = taskAttributes[key].replace(/^\+*\d+$/gi, function(a,b) {
 			console.log("found attribute with number " + a + " " + b);
-			var result =a.split('').join(' ');
+			var result =a.split('').join('.');
 			console.log("Returning " + result)
  			return result;
         
