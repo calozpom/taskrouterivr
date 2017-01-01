@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var twilio = require('twilio');
 var express = require('express');
 var app = express();
+const querystring = require('querystring');
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
@@ -206,7 +207,7 @@ function checkForExistingTask(CallSid, fn) {
 function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
 	for (key in taskAttributes) {
-		newKey = "task_"+key;
+		newKey = "task"+key;
 		taskAttributes[newKey]=taskAttributes[key];
 		delete taskAttributes[key];
 		console.log("trying to check attribute " + taskAttributes[newKey]);
@@ -226,7 +227,7 @@ function getTwimlfromTwimlBin(task) {
 	}
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
 	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d?";
-	twimlResponse+=encodeURIComponent(JSON.stringify(taskAttributes));
+	twimlResponse+=querystring.stringify(taskAttributes);
 	twimlResponse +="</Redirect></Response>"
 	return twimlResponse;
 }
