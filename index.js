@@ -217,6 +217,8 @@ function getTwimlfromTwimlBin(task) {
 		console.log("edited value is " + editedAttributeValue);
 		console.log("taskattributes key is " + taskAttributes[key]);
 		taskAttributes[key]=editedAttributeValue;
+		console.log("taskattributes key is " + taskAttributes[key]);
+
 
 	}
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
