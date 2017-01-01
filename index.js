@@ -206,7 +206,7 @@ function checkForExistingTask(CallSid, fn) {
 function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
 	for (key in taskAttributes) {
-		newKey = "task."+key;
+		newKey = "task_"+key;
 		taskAttributes[newKey]=taskAttributes[key];
 		delete taskAttributes[key];
 		console.log("trying to check attribute " + taskAttributes[newKey]);
