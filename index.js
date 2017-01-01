@@ -214,7 +214,7 @@ function getTwimlfromTwimlBin(task) {
 		"From" rather than the one natively available to the twimlBin, due to needing to edit it to
 		Make Alice speak numbers right
 		*/
-		newKey = "task."+key;
+		newKey = "task_"+key;
 		taskAttributes[newKey]=taskAttributes[key];
 		delete taskAttributes[key];
 		/* Next lets match anything that a number or an E164 number and put spaces between them
@@ -236,6 +236,33 @@ function getTwimlfromTwimlBin(task) {
 
 	return resp.toString();
 }
+
+
+
+/* 
+Functions below here are placeholders for where you could add additional logic
+*/
+
+app.get('/nodechange', function(request, response) {
+    /* This function is triggered on the event when a task changes TaskQueue. TaskQueues represent individual nodes within an IVR.
+    */
+    if (request.body.TaskSid && request.body.EventType == "task-queue.entered") {
+        console.log("task moved into new queue " + request.body.TaskQueueSid);
+    }
+});
+
+/* 
+functions beneath here are not core to the function and can be ignored or were built during the process as test functions.
+*/
+
+app.get('/alive', function(request, response) {
+
+    response.send('I AM ALIVE');
+});
+
+app.listen(app.get('port'), function() {
+    console.log('Node app is running on port', app.get('port'));
+});
 
 function getTwimlForTaskQueue(task) {
 	var twimlResponse="";
@@ -277,29 +304,4 @@ function replaceTokensWithAttributes(twimlResponse, task) {
 	return parsedResponse;
 
 }
-
-/* 
-Functions below here are placeholders for where you could add additional logic
-*/
-
-app.get('/nodechange', function(request, response) {
-    /* This function is triggered on the event when a task changes TaskQueue. TaskQueues represent individual nodes within an IVR.
-    */
-    if (request.body.TaskSid && request.body.EventType == "task-queue.entered") {
-        console.log("task moved into new queue " + request.body.TaskQueueSid);
-    }
-});
-
-/* 
-functions beneath here are not core to the function and can be ignored
-*/
-
-app.get('/alive', function(request, response) {
-
-    response.send('I AM ALIVE');
-});
-
-app.listen(app.get('port'), function() {
-    console.log('Node app is running on port', app.get('port'));
-});
 
