@@ -243,7 +243,8 @@ function getTwimlfromTwimlBin(task) {
 	console.log(querystring.stringify(taskAttributes));
 	twimlResponse+=querystring.stringify(taskAttributes);
 	twimlResponse +="</Redirect></Response>"
-	return twimlResponse;
+	return resp.toString();
+	//return twimlResponse;
 }
 
 function getTwimlForTaskQueue(task) {
