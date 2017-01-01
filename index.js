@@ -206,6 +206,8 @@ function checkForExistingTask(CallSid, fn) {
 
 function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
+	var resp=new twilio.TwimlResponse();
+
 
 	for (key in taskAttributes) {
 		newKey = "task"+key;
@@ -227,6 +229,14 @@ function getTwimlfromTwimlBin(task) {
 
 
 	}
+	var redirectUrl="";
+	redirectUrl+="https://handler.twilio.com/twiml/";
+	redirectUrl+="EH43e353c16b04583ef2c7ee8769ac219d?";
+	redirectUrl+=querystring.stringify(taskAttributes);
+	resp.redirect(redirectUrl);
+	console.log("twiml to string:");
+	console.log(resp.toString());
+
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
 	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d?";
 	console.log(encodeURIComponent(taskAttributes));
