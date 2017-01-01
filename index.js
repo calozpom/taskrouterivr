@@ -59,7 +59,8 @@ app.post('/initiateivr', function(request, response) {
 			createTask(attributesJson, function(returnedTask){
 				console.log("created a new task for this call with SID " + returnedTask.sid);
 				//console.log(returnedTask);
-				response.send(getTwimlForTaskQueue(returnedTask));
+				//response.send(getTwimlForTaskQueue(returnedTask));
+				response.send(getTwimlfromTwimlBin(returnedTask));
 			});
     	}
     	else {
@@ -69,7 +70,9 @@ app.post('/initiateivr', function(request, response) {
     		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
     		updateTask(attributesJson, returnedTask, function(updatedTask){
     			console.log("getting twiml for a task in queue " + updatedTask.task_queue_friendly_name);
-	    		response.send(getTwimlForTaskQueue(updatedTask));
+	    		//response.send(getTwimlForTaskQueue(updatedTask));
+				response.send(getTwimlfromTwimlBin(returnedTask));
+
 
 	    	});
     	}
@@ -188,19 +191,23 @@ function checkForExistingTask(CallSid, fn) {
                 console.log(task.attributes);
                 console.log("will use this existing task sid for this conversation " + task.sid);
                 taskToReturn=task;
-                console.log("ONE");
                 fn(taskToReturn);
                 return;
             }
-            console.log("TWO");
             fn(taskToReturn);
         }
         else {
-        	console.log("THREE");
         	fn(taskToReturn);
         }
     });
     
+}
+
+function getTwimlfromTwimlBin(task) {
+	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect></Redirect>https://handler.twilio.com/twiml/";
+	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d";
+	twimlResponse +="</Redirect></Response>"
+	return twimlResponse;
 }
 
 function getTwimlForTaskQueue(task) {
@@ -211,7 +218,7 @@ function getTwimlForTaskQueue(task) {
         break;
 
      case "second_node":
-        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call from %From% was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
+        twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call from %From% was routed to the second node. You entered %first_node_entered_digits%</Say><Redirect></Redirect></Response>"
         break;
      case "enqueue":
         twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>This call from %From% was routed to the second node. You entered %first_node_entered_digits%</Say></Response>"
