@@ -206,6 +206,7 @@ function checkForExistingTask(CallSid, fn) {
 
 function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
+
 	for (key in taskAttributes) {
 		newKey = "task"+key;
 		taskAttributes[newKey]=taskAttributes[key];
@@ -218,8 +219,9 @@ function getTwimlfromTwimlBin(task) {
  			return result;
         
 	});
+
 		console.log("edited value is " + editedAttributeValue);
-		console.log("taskattributes key is " + taskAttributes[newKey]);
+		console.log("taskAttributes key is " + taskAttributes[newKey]);
 		taskAttributes[newKey]=editedAttributeValue;
 		console.log("taskattributes key is " + taskAttributes[newKey]);
 
@@ -227,6 +229,7 @@ function getTwimlfromTwimlBin(task) {
 	}
 	twimlResponse="<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Redirect>https://handler.twilio.com/twiml/";
 	twimlResponse+="EH43e353c16b04583ef2c7ee8769ac219d?";
+	console.log(encodeURIComponent(taskAttributes));
 	console.log(querystring.stringify(taskAttributes));
 	twimlResponse+=querystring.stringify(taskAttributes);
 	twimlResponse +="</Redirect></Response>"
