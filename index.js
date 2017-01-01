@@ -215,7 +215,7 @@ function getTwimlfromTwimlBin(task) {
         
 	});
 		console.log("edited value is " + editedAttributeValue);
-		console.log("taskattributes key is " taskAttributes[key]);
+		console.log("taskattributes key is " + taskAttributes[key]);
 		taskAttributes[key]=editedAttributeValue;
 
 	}
