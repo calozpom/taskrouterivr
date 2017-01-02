@@ -230,7 +230,7 @@ function getTwimlfromTwimlBin(task) {
 	redirectUrl+="https://handler.twilio.com/twiml/";
 	// Extract the TwiML Bin URL from the taskqueue name:
 	redirectUrl+=task.task_queue_friendly_name.split(':')[1];
-
+    redirectUrl+="?";
 	redirectUrl+=querystring.stringify(taskAttributes);
 	resp.redirect(redirectUrl);
 
