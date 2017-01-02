@@ -67,10 +67,10 @@ app.post('/initiateivr', function(request, response) {
     	else {
     		console.log("existing call, call SID " + request.body['CallSid'] +" correlates to task " + returnedTask.sid);
     		console.log("Dialed digits " + request.body['Digits']);
-    		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name;
-    		attributesJson[returnedTask.task_queue_friendly_name + '_entered_digits'] = request.body['Digits'];
+    		attributesJson['exited_node'] = returnedTask.task_queue_friendly_name.split(':')[0];
+    		attributesJson[returnedTask.task_queue_friendly_name.split(':')[0] + '_entered_digits'] = request.body['Digits'];
     		updateTask(attributesJson, returnedTask, function(updatedTask){
-    			console.log("getting twiml for a task in queue " + updatedTask.task_queue_friendly_name);
+    			console.log("getting twiml for a task in queue " + updatedTask.task_queue_friendly_name.split(':')[0]);
 	    		//response.send(getTwimlForTaskQueue(updatedTask));
 				response.send(getTwimlfromTwimlBin(returnedTask));
 
@@ -139,7 +139,7 @@ function updateTask(attributesJson, task, fn) {
         //console.log(body);
         var newTaskResponse = JSON.parse(body);
         console.log("updated the task with Sid " + newTaskResponse.sid + "with attributes");
-        console.log("Task is now in the queue " + newTaskResponse.task_queue_friendly_name);
+        console.log("Task is now in the queue " + newTaskResponse.task_queue_friendly_name.split(':')[0]);
         /* In an ideal world this would be all you'd have to do
         But TaskRouter will sometimes return the task before the workflow has been re-run and so you'll still get the current queue
         back not the new queue
@@ -148,7 +148,7 @@ function updateTask(attributesJson, task, fn) {
         	console.log("Forced a workflow refresh");
         	console.log("Attempting to look for the task again with call sid " + mergedAttributes['CallSid'])
         	checkForExistingTask(mergedAttributes['CallSid'], function(returnedTask){
-        		console.log("forcibly updated task. New queue is now " + returnedTask.task_queue_friendly_name);
+        		console.log("forcibly updated task. New queue is now " + returnedTask.task_queue_friendly_name.split(':')[0]);
         		fn(returnedTask);
         	});
         });
@@ -223,19 +223,47 @@ function getTwimlfromTwimlBin(task) {
 			var result =a.split('').join('  ');
  			return result;
         
-	});
+		});
 		taskAttributes[newKey]=editedAttributeValue;
 	}
 	var redirectUrl="";
 	redirectUrl+="https://handler.twilio.com/twiml/";
 	// Extract the TwiML Bin URL from the taskqueue name:
-	redirectUrl+="EH43e353c16b04583ef2c7ee8769ac219d?";
+	redirectUrl+=task.task_queue_friendly_name.split(':')[1];
 
 	redirectUrl+=querystring.stringify(taskAttributes);
 	resp.redirect(redirectUrl);
 
 	return resp.toString();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
