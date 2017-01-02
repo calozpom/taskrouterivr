@@ -207,7 +207,7 @@ function checkForExistingTask(CallSid, fn) {
 function getTwimlfromTwimlBin(task) {
 	var taskAttributes=JSON.parse(task.attributes);
 	var resp=new twilio.TwimlResponse();
-
+    console.log("getting twiml from twimlbin for task in queue " + task.task_queue_friendly_name);
 	
 	for (key in taskAttributes) {
 		/* First we will rename the attribute keys, because we want to use our own
