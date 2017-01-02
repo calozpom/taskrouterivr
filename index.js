@@ -72,7 +72,7 @@ app.post('/initiateivr', function(request, response) {
     		updateTask(attributesJson, returnedTask, function(updatedTask){
     			console.log("getting twiml for a task in queue " + updatedTask.task_queue_friendly_name.split(':')[0]);
 	    		//response.send(getTwimlForTaskQueue(updatedTask));
-				response.send(getTwimlfromTwimlBin(returnedTask));
+				response.send(getTwimlfromTwimlBin(updatedTask));
 
 
 	    	});
