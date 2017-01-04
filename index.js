@@ -237,47 +237,48 @@ function getTwimlfromTwimlBin(task) {
 	return resp.toString();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* 
 Functions below here are placeholders for where you could add additional logic
 */
 
 app.get('/nodechange', function(request, response) {
     /* This function is triggered on the event when a task changes TaskQueue. TaskQueues represent individual nodes within an IVR.
+    For example you could trigger background logic to happen when a task enters (or exits) particular IVR states.
     */
     if (request.body.TaskSid && request.body.EventType == "task-queue.entered") {
         console.log("task moved into new queue " + request.body.TaskQueueSid);
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* 
 functions beneath here are not core to the function and can be ignored or were built during the process as test functions.
