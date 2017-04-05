@@ -185,8 +185,14 @@ function forceTaskRefresh(taskSid, fn) {
     newWorkflow.task_routing.filters[0].filter_friendly_name += "..";
     console.log(newWorkflow.task_routing.filters[0].filter_friendly_name);
     console.log(JSON.stringify(newWorkflow));
+    client.workspace.workflows("WW404ac496bea3aa47579de9204d661e77").update({
+    	ReEvaluateTasks: true,
+	    Configuration: newWorkflow
+}, function(err, workflow) {
+    fn(true);
+});
 
-
+/*
 	var tempOptions = {
 	      method: 'POST',
 	      url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Workflows/' + workflowSid,
@@ -202,7 +208,7 @@ function forceTaskRefresh(taskSid, fn) {
 	    req(tempOptions, function(error, response, body) {
 	      if (error) throw new Error(error);
 	      fn(true);
-	  });
+	  });*/
 });
 }
 
