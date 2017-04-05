@@ -340,7 +340,19 @@ app.get('/deletealltasks', function(request, response) {
 });
 
 
+app.get('/workspacetoken', function(request, response) {
+  var workspacecapability = new twilio.TaskRouterWorkspaceCapability(accountSid, authToken, workspaceSid);
+  workspacecapability.allowFetchSubresources();
+  workspacecapability.allowUpdatesSubresources();
+  workspacecapability.allowDeleteSubresources();
+  var workspacetoken = workspacecapability.generate(86400);
 
+  var capability = new twilio.TaskRouterWorkerCapability(accountSid, authToken, workspaceSid, workerSid);
+  capability.allowActivityUpdates();
+  capability.allowReservationUpdates();
+  var token = capability.generate(86400);
+  response.send({workspacetoken:workspacetoken,token:token});
+});
 
 
 
