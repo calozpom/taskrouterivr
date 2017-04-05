@@ -181,6 +181,9 @@ function updateTask(attributesJson, task, fn) {
 function forceTaskRefresh(taskSid, fn) {
 	client.workspace.workflows("WW404ac496bea3aa47579de9204d661e77").get(function(err, workflow) {
     console.log(JSON.parse(workflow.configuration).task_routing.filters[0].filter_friendly_name);
+    var newWorkflow = JSON.parse(workflow.configuration);
+    newWorkflow.task_routing.filters[0].filter_friendly_name += "..";
+    console.log(newWorkflow);
 });
 	var tempOptions = {
 	      method: 'POST',
@@ -190,7 +193,8 @@ function forceTaskRefresh(taskSid, fn) {
 	        password: authToken
 	      },
 	      form: {
-	        ReEvaluateTasks: true
+	        ReEvaluateTasks: true,
+	        Configuration: newWorkflow
 	      }
 	    };
 	    req(tempOptions, function(error, response, body) {
