@@ -24,7 +24,7 @@ app.disable('view cache');
 var accountSid = process.env.accountSid;
 var authToken = process.env.authToken;
 var workspaceSid = process.env.workspaceSid;
-var workerSid = process.env.workerSid;
+var workerSid = process.env.workerSid;	
 var workflowSid = process.env.workflowSid;
 var firebaseSecret = process.env.firebaseSecret;
 
@@ -296,12 +296,14 @@ app.post('/eventstream', function(request, response) {
         eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).remove();
         break;
       case "task.canceled":
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).remove();
+
         break;
       case "task.completed":
         dataToSet['attributes'] = request.body.TaskAttributes;
         dataToSet['sid'] = request.body.TaskSid;
         dataToSet['status'] = request.body.TaskAssignmentStatus;
-        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).setWithPriority(dataToSet, request.body.TaskAge)
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).remove();
         break;
       case "task.updated":
         dataToSet['attributes'] = request.body.TaskAttributes;

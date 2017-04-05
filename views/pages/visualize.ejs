@@ -147,7 +147,7 @@ function buildTaskRouterGrid() {
         	htmlToAdd += "<div class='box'>";
         	htmlToAdd += "<div class='box-icon'><img src='img/taskrouter-icon_wb.png'></div>";
         	htmlToAdd += "<div class='info'>";
-        	htmlToAdd += "<h4 class='text-center'>" + data[i].friendlyName + "</h4>";
+        	htmlToAdd += "<h4 class='text-center'>" + data[i].friendlyName.split(':')[0] + "</h4>";
         	htmlToAdd += "<div id='queueColumn"+data[i].sid+"'>"
 
 
