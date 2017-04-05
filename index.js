@@ -187,7 +187,7 @@ function forceTaskRefresh(taskSid, fn) {
     console.log(JSON.stringify(newWorkflow));
     client.workspace.workflows("WW404ac496bea3aa47579de9204d661e77").update({
     	ReEvaluateTasks: true,
-	    Configuration: JSON.stringify(newWorkflow);
+	    Configuration: JSON.stringify(newWorkflow)
 }, function(err, workflow) {
 	console.log(workflow);
 	console.log(err);
