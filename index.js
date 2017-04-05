@@ -184,7 +184,7 @@ function forceTaskRefresh(taskSid, fn) {
     var newWorkflow = JSON.parse(workflow.configuration);
     newWorkflow.task_routing.filters[0].filter_friendly_name += "..";
     console.log(newWorkflow);
-});
+
 	var tempOptions = {
 	      method: 'POST',
 	      url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Workflows/' + workflowSid,
@@ -201,7 +201,7 @@ function forceTaskRefresh(taskSid, fn) {
 	      if (error) throw new Error(error);
 	      fn(true);
 	  });
-
+});
 }
 
 function checkForExistingTask(CallSid, fn) {
