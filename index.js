@@ -21,6 +21,15 @@ var workflowSid = process.env.workflowSid;
 
 var client = new twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
 
+var firebaseToken = firebaseTokenGenerator.createToken({ uid: "secure-server"}, { expires: 4121017284});
+console.log(firebaseToken);
+var myFirebase = new Firebase("https://taskrouterivr.firebaseio.com/");
+myFirebase.authWithCustomToken(firebaseToken, function(error, authData) {
+  console.log("firebase auth status:");
+  console.log(error);
+  console.log(authData);
+});
+
 /* the overview of this application is:
 This is a state machine which uses TaskRouter as the underlying engine for an IVR. Each Queue within TaskRouter represents a node within an IVR tree
  - When a call comes in to a twilio Number, Twilio Webhooks to this application requesting TwiML instructions to the call
@@ -250,7 +259,75 @@ app.get('/nodechange', function(request, response) {
     }
 });
 
+app.post('/eventstream', function(request, response) {
+  // This function consumes the event stream and structures it into firebase data
+  // This firebase structure is then used for real time visualization of queue state
+  var eventstream = myFirebase.child("ivrtree");
+  console.log("received event " + request.body.EventType);
+  //console.log(request.body); 
+  if (request.body.TaskSid) {
+    dataToSet = {};
+    switch (request.body.EventType) {
+      case "task.deleted":
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).remove();
+        break;
+      case "task-queue.entered":
+        dataToSet['attributes'] = request.body.TaskAttributes;
+        dataToSet['sid'] = request.body.TaskSid;
+        dataToSet['status'] = request.body.TaskAssignmentStatus;
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).setWithPriority(dataToSet, request.body.TaskAge)
+        break;
+      case "task-queue.timeout":
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).remove();
 
+        break;
+      case "task-queue.moved":
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).remove();
+        break;
+      case "task.canceled":
+        break;
+      case "task.completed":
+        dataToSet['attributes'] = request.body.TaskAttributes;
+        dataToSet['sid'] = request.body.TaskSid;
+        dataToSet['status'] = request.body.TaskAssignmentStatus;
+        eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).setWithPriority(dataToSet, request.body.TaskAge)
+        break;
+      case "task.updated":
+        dataToSet['attributes'] = request.body.TaskAttributes;
+        dataToSet['sid'] = request.body.TaskSid;
+        dataToSet['status'] = request.body.TaskAssignmentStatus;
+        //eventstream.child(request.body.TaskQueueSid).child(request.body.TaskSid).setWithPriority(dataToSet, request.body.TaskAge)
+        break;
+
+
+    }
+    //eventstream.child(request.body.TaskSid).push({'update':request.body});
+  }
+  response.send('');
+});
+
+app.get('/visualize', function(request, response) {
+  //visualize shows a visual representation of TaskRouter state
+  response.setHeader('Cache-Control', 'no-cache');
+  response.render('pages/visualize');
+});
+
+app.get('/deletealltasks', function(request, response) {
+  //this page purges all TaskRouter and Firebase content in order to reset the demo
+  client.workspace.tasks.list(function(err, data) {
+    if (!err) {
+      console.log(data);
+      data.tasks.forEach(function(task) {
+        client.workspace.tasks(task.sid).delete();
+        console.log('deleted task ' + task.sid);
+        //task.delete();
+      })
+    }
+  })
+  myFirebase.remove();
+  response.send('all tasks deleted');
+  //client.workspace.tasks.delete()
+});
 
 
 
@@ -333,4 +410,6 @@ function replaceTokensWithAttributes(twimlResponse, task) {
 	return parsedResponse;
 
 }
+
+
 
