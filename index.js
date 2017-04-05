@@ -5,6 +5,9 @@ var twilio = require('twilio');
 var express = require('express');
 var app = express();
 const querystring = require('querystring');
+var FirebaseTokenGenerator = require('firebase-token-generator');
+var Firebase = require('firebase');
+
 
 app.set('port', (process.env.PORT || 5000));
 app.use(express.static(__dirname + '/public'));
@@ -18,12 +21,15 @@ var accountSid = process.env.accountSid;
 var authToken = process.env.authToken;
 var workspaceSid = process.env.workspaceSid;
 var workflowSid = process.env.workflowSid;
+var firebaseSecret = process.env.firebaseSecret;
+
 
 var client = new twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
 
+var firebaseTokenGenerator = new FirebaseTokenGenerator(firebaseSecret);
 var firebaseToken = firebaseTokenGenerator.createToken({ uid: "secure-server"}, { expires: 4121017284});
 console.log(firebaseToken);
-var myFirebase = new Firebase("https://taskrouterivr.firebaseio.com/");
+var myFirebase = new Firebase("https://taskrouter.firebaseio.com/");
 myFirebase.authWithCustomToken(firebaseToken, function(error, authData) {
   console.log("firebase auth status:");
   console.log(error);
