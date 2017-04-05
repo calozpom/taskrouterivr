@@ -180,7 +180,7 @@ function updateTask(attributesJson, task, fn) {
 
 function forceTaskRefresh(taskSid, fn) {
 	client.workspace.workflows("WW404ac496bea3aa47579de9204d661e77").get(function(err, workflow) {
-    console.log(workflow.configuration.task_routing.filters[0]);
+    console.log(workflow.configuration);
 });
 	var tempOptions = {
 	      method: 'POST',
