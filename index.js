@@ -24,6 +24,7 @@ app.disable('view cache');
 var accountSid = process.env.accountSid;
 var authToken = process.env.authToken;
 var workspaceSid = process.env.workspaceSid;
+var workerSid = process.env.workerSid;
 var workflowSid = process.env.workflowSid;
 var firebaseSecret = process.env.firebaseSecret;
 
