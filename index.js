@@ -189,6 +189,8 @@ function forceTaskRefresh(taskSid, fn) {
     	ReEvaluateTasks: true,
 	    Configuration: newWorkflow
 }, function(err, workflow) {
+	console.log(workflow);
+	console.log(err);
     fn(true);
 });
 
