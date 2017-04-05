@@ -179,6 +179,9 @@ function updateTask(attributesJson, task, fn) {
 }
 
 function forceTaskRefresh(taskSid, fn) {
+	client.workspace.workflows("WW404ac496bea3aa47579de9204d661e77").get(function(err, workflow) {
+    console.log(JSON.parse(workflow));
+});
 	var tempOptions = {
 	      method: 'POST',
 	      url: 'https://taskrouter.twilio.com/v1/Workspaces/' + workspaceSid + '/Workflows/' + workflowSid,
