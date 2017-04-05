@@ -183,7 +183,9 @@ function forceTaskRefresh(taskSid, fn) {
     console.log(JSON.parse(workflow.configuration).task_routing.filters[0].filter_friendly_name);
     var newWorkflow = JSON.parse(workflow.configuration);
     newWorkflow.task_routing.filters[0].filter_friendly_name += "..";
-    console.log(newWorkflow);
+    console.log(newWorkflow.task_routing.filters[0].filter_friendly_name);
+    console.log(JSON.stringify(newWorkflow));
+
 
 	var tempOptions = {
 	      method: 'POST',
